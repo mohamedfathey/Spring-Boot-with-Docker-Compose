@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  mysql_db:
+    image: mysql:8.0.27
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: learn
+      MYSQL_USER: springstudent
+      MYSQL_PASSWORD: springstudent
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+  spring_app:
+    build: .
+    container_name: spring_container
+    ports:
+      - "8080:8081"   
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/learn?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: springstudent
+      SPRING_DATASOURCE_PASSWORD: springstudent
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+    depends_on:
+      - mysql_db
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
